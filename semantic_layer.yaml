@@ -1,0 +1,49 @@
+# Governed business definitions. The agent may only build SQL from what is defined here,
+# so every metric means the same thing in every answer.
+fact_table: fact_transactions
+metrics:
+  total_spend:
+    sql: SUM(f.amount)
+    description: Total transaction amount in dollars
+    synonyms: [spend, revenue, sales, amount, volume, total]
+  transaction_count:
+    sql: COUNT(*)
+    description: Number of transactions
+    synonyms: [count, transactions, number of transactions, how many]
+  average_ticket:
+    sql: ROUND(AVG(f.amount), 2)
+    description: Average transaction amount
+    synonyms: [average, avg, average ticket, average amount]
+  fraud_rate:
+    sql: ROUND(100.0 * SUM(f.is_fraud) / COUNT(*), 2)
+    description: Percent of transactions flagged as fraud
+    synonyms: [fraud rate, fraud percentage, fraud]
+  active_customers:
+    sql: COUNT(DISTINCT f.customer_id)
+    description: Distinct customers with at least one transaction
+    synonyms: [customers, active customers, unique customers]
+dimensions:
+  month:
+    sql: d.month
+    join: JOIN dim_date d ON f.date_key = d.date_key
+    synonyms: [month, monthly, by month, trend]
+  category:
+    sql: m.category
+    join: JOIN dim_merchant m ON f.merchant_id = m.merchant_id
+    synonyms: [category, merchant category, categories]
+  merchant:
+    sql: m.merchant_name
+    join: JOIN dim_merchant m ON f.merchant_id = m.merchant_id
+    synonyms: [merchant, merchants, store]
+  segment:
+    sql: c.segment
+    join: JOIN dim_customer c ON f.customer_id = c.customer_id
+    synonyms: [segment, customer segment, tier]
+  state:
+    sql: c.state
+    join: JOIN dim_customer c ON f.customer_id = c.customer_id
+    synonyms: [state, states, region, location]
+  channel:
+    sql: f.channel
+    join: ""
+    synonyms: [channel, online, in store]
